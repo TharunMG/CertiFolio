@@ -1,0 +1,33 @@
+# Root Gitignore for CertiFolio
+
+# OS & IDE
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+.vscode/
+*.log
+
+# Backend (Maven & Java)
+backend/target/
+backend/*.class
+backend/.project
+backend/.classpath
+backend/.settings/
+backend/uploads/certificates/*
+!backend/uploads/certificates/.gitkeep
+
+# Frontend (Node & Vite)
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+frontend/.env.*.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Database & Runtime
+*.h2.db
+*.trace.db
+backend/data/
+data/
