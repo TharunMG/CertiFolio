@@ -1,139 +1,137 @@
 # CertiFolio: Student Skill & Certification Registry
 
 > **Verified Academic Skill & Credential Registry**  
-> *B.Tech / B.E. Computer Science Mini-Project Blueprint Implementation*  
+> *B.Tech / B.E. 2nd-Year Computer Science Mini-Project Blueprint Implementation*  
 > Built with **React.js 19 + Tailwind CSS + Java 21 / 24 + Spring Boot 3.3 + OpenPDF + H2/MySQL**
 
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3.6-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-21%20%7C%2024%20LTS-orange.svg)](https://www.oracle.com/java/)
 [![React](https://img.shields.io/badge/React-18%20%2F%2019-blue.svg)](https://react.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38bdf8.svg)](https://tailwindcss.com/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![OpenPDF](https://img.shields.io/badge/OpenPDF-2.0.3-red.svg)](https://github.com/LibrePDF/OpenPDF)
+[![Swagger](https://img.shields.io/badge/Swagger-OpenAPI%203.0-green.svg)](http://localhost:8080/swagger-ui/index.html)
 
 ---
 
-## 1. Project Overview
+## 📑 Evaluation Deliverables & Documentation Index
 
-**CertiFolio** solves the academic challenge of unverified student claims by providing an institutional credential and skill registry. Students upload digital course certificates (PDF/PNG/JPEG) from platforms like NPTEL, Coursera, or AWS, and attach technical skill tags with proficiency levels and project repository links. 
+In accordance with mini-project review criteria, the documentation is organized into four formal deliverables:
 
-Department faculty members audit submissions inside an interactive previewer, approve or reject them with audit remarks, and search placement-ready talent by department, CGPA, and specific technical competencies. Public shareable portfolios strictly filter only **`VERIFIED`** credentials to protect institutional integrity.
+| Deliverable | Document Link | Description |
+| :--- | :--- | :--- |
+| **1. Project Overview & Quickstart** | [**README.md**](README.md) *(This Document)* | Project identity, branding, features, running instructions, and demo credentials |
+| **2. API Documentation** | [**docs/API_DOCUMENTATION.md**](docs/API_DOCUMENTATION.md) | Exhaustive REST API contract, request/response JSON schemas, cURL examples, and error handling |
+| **3. Design Documentation** | [**docs/DESIGN_DOCUMENTATION.md**](docs/DESIGN_DOCUMENTATION.md) | System topology, Mermaid architecture, ER diagram, UML class diagram, sequence diagrams, and state machine |
+| **4. Code-Level Documentation** | [**docs/CODE_LEVEL_DOCUMENTATION.md**](docs/CODE_LEVEL_DOCUMENTATION.md) | Class-by-class backend breakdown, Java 21 records, React components, state context, and JUnit 5 tests |
 
 ---
 
-## 2. Full-Stack System Architecture
+## 1. Executive Summary & Problem Statement
+
+In academic institutions, students accumulate diverse credentials from external learning platforms (NPTEL, Coursera, AWS, HackerRank) and declare technical proficiencies on their resumes. However, placement departments and evaluators face significant challenges in **verifying the authenticity of these claims**.
+
+**CertiFolio** solves this challenge through a tamper-resistant, faculty-audited registry:
+1. **Student Dashboard & Skill Matrix**: Students register competencies with proficiency levels (`BEGINNER`, `INTERMEDIATE`, `ADVANCED`), attach GitHub proof projects, and upload digital certificates (PDF/PNG/JPEG).
+2. **Faculty Verification Console**: Authorized faculty audit submissions via an in-browser previewer, confirm credential IDs, and approve or reject proofs with immutable audit timestamps and remarks.
+3. **Talent Discovery Search**: Placement officers query students by exact skill combinations, department, and minimum CGPA.
+4. **Public Verified Portfolio**: A publicly shareable profile strictly filtering only `VERIFIED` credentials, equipped with a one-click **Official OpenPDF Transcript Generator**.
+
+---
+
+## 2. Decoupled System Architecture
 
 ```
-┌─────────────────────────────────┐                 ┌──────────────────────────────────────┐
-│       React.js Frontend         │                 │       Spring Boot REST API           │
-│   (Vite, Tailwind, Axios JWT)   │  HTTP / JSON /  │  (SecurityFilterChain, DTO Records)  │
-│          Port: 5173             │◄───────────────►│             Port: 8080               │
-└─────────────────────────────────┘    Multipart    └──────────────────┬───────────────────┘
-                                                                       │
-                                            ┌──────────────────────────┴─────────────────────────┐
-                                            ▼                                                    ▼
-                             ┌───────────────────────────────┐                    ┌───────────────────────────────┐
-                             │    H2 Database / MySQL 8.0    │                    │     NIO File Storage          │
-                             │      5 Normalized Tables      │                    │   /uploads/certificates/      │
-                             │  Spring Data JPA Repositories │                    │    UUID Collision Prevention  │
-                             └───────────────────────────────┘                    └───────────────────────────────┘
+┌──────────────────────────────────────┐                   ┌────────────────────────────────────────┐
+│          React 19 SPA (Vite)         │   JSON / HTTP     │          Spring Boot REST API          │
+│  - Tailwind CSS Responsive Design    │◄─────────────────►│  - Stateless JWT SecurityFilterChain  │
+│  - Axios with Bearer Interceptor     │    Multipart      │  - Java 21 Record DTOs                 │
+│  - In-Browser PDF/Image Previewer    │                   │  - OpenPDF Dynamic PDF Engine          │
+│             Port: 5173               │                   │              Port: 8080                │
+└──────────────────────────────────────┘                   └───────────────────┬────────────────────┘
+                                                                               │
+                                                    ┌──────────────────────────┴─────────────────────────┐
+                                                    ▼                                                    ▼
+                                     ┌───────────────────────────────┐                    ┌───────────────────────────────┐
+                                     │     H2 / MySQL 8.0 Database   │                    │     NIO File Storage          │
+                                     │   5 Normalized Relational     │                    │   /uploads/certificates/      │
+                                     │   Spring Data JPA Repos       │                    │   Collision-Safe UUID Proofs  │
+                                     └───────────────────────────────┘                    └───────────────────────────────┘
 ```
 
 ---
 
-## 3. Relational Database Schema & JPA Entities
+## 3. Relational Database Normalization (5 Core Tables)
 
-| Entity | Table | Key Columns & Constraints | JPA Relationship Mapping |
-| :--- | :--- | :--- | :--- |
-| **User** | `users` | `id` (PK), `email` (Unique, Not Null), `password_hash`, `role` (`ROLE_STUDENT`, `ROLE_FACULTY`), `created_at` | `@OneToOne(mappedBy = "user")` with `StudentProfile` |
-| **StudentProfile** | `student_profiles` | `id` (PK), `roll_number` (Unique), `full_name`, `department`, `year_of_study`, `cgpa`, `github_url`, `linkedin_url` | `@OneToOne` with `User`, `@OneToMany` with `StudentSkill` & `Certification` |
-| **Skill** | `skills` | `id` (PK), `skill_name` (Unique), `category` (`BACKEND`, `FRONTEND`, `DATABASE`, `CLOUD`, `TOOLS`) | Master catalog referenced by `StudentSkill` |
-| **StudentSkill** | `student_skills` | `id` (PK), `proficiency` (`BEGINNER`, `INTERMEDIATE`, `ADVANCED`), `project_link`, `endorsed` | `@ManyToOne` joining `StudentProfile` and `Skill` |
-| **Certification** | `certifications` | `id` (PK), `title`, `issuer`, `credential_id`, `issue_date`, `file_path`, `status` (`PENDING`, `VERIFIED`, `REJECTED`), `remarks`, `verified_at` | `@ManyToOne(fetch = LAZY)` joining `StudentProfile` |
+1. **`users`**: Email (Unique), password hash (BCrypt), role (`ROLE_STUDENT`, `ROLE_FACULTY`, `ROLE_ADMIN`), creation timestamp.
+2. **`student_profiles`**: Roll number (Unique), full name, department, year of study, CGPA, GitHub URL, LinkedIn URL.
+3. **`skills`**: Master catalog of industry skills across Backend, Frontend, Database, Cloud, and Tools.
+4. **`student_skills`**: Join table mapping students to skills with proficiency levels (`BEGINNER`, `INTERMEDIATE`, `ADVANCED`), project links, and endorsement flags.
+5. **`certifications`**: Student certificate records with title, issuer, credential ID, file path, status (`PENDING`, `VERIFIED`, `REJECTED`), faculty remarks, and audit timestamps.
 
 ---
 
-## 4. REST API Specification
+## 4. Single-Command Launch (Zero Configuration)
 
-| Method | Endpoint | Access Role | Description |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/login` | Public | Authenticates credentials and issues stateless JWT Bearer token |
-| `POST` | `/api/auth/register` | Public | Registers a new student or faculty account |
-| `GET` | `/api/portfolio/{rollNo}` | Public | Fetches student bio, skills, and strictly `VERIFIED` certificates |
-| `GET` | `/api/portfolio/{rollNo}/pdf` | Public | Generates downloadable official OpenPDF transcript |
-| `GET` | `/api/skills` | Public | Lists all master skills in catalog |
-| `GET` | `/api/files/{fileName}` | Public | Serves certificate proofs for in-browser modal preview |
-| `GET` | `/api/students/{id}/profile` | Student / Faculty | Fetches student profile metrics |
-| `POST` | `/api/students/{id}/skills` | Student | Links a master skill and proficiency pill to student profile |
-| `DELETE` | `/api/students/{id}/skills/{skillId}` | Student | Removes skill from student profile |
-| `POST` | `/api/students/{id}/certifications` | Student | Uploads multipart PDF/PNG file and creates `PENDING` record |
-| `GET` | `/api/students/{id}/certifications` | Student / Faculty | Retrieves all certificate submissions and verification status |
-| `GET` | `/api/faculty/certifications/pending` | Faculty | Populates faculty audit review queue |
-| `PATCH` | `/api/faculty/certifications/{id}/verify`| Faculty | Updates status to `VERIFIED` or `REJECTED` with remarks |
-| `GET` | `/api/faculty/students/search` | Faculty | Multi-filter talent query (`?skill=...&dept=...&minCgpa=...`) |
+CertiFolio includes one-click launch scripts that automatically detect Java 24 and Maven, start both services in parallel, and open your web browser:
+
+### Option A: Windows Batch File (Double-Click)
+Double-click [`run.bat`](run.bat) from File Explorer, or run:
+```cmd
+.\run.bat
+```
+
+### Option B: PowerShell
+```powershell
+.\run.ps1
+```
+
+### Option C: Manual Startup
+- **Backend (Port 8080)**:
+  ```powershell
+  cd backend
+  $env:JAVA_HOME = "C:\Program Files\Apache NetBeans\jdk"
+  mvn spring-boot:run
+  ```
+- **Frontend (Port 5173)**:
+  ```powershell
+  cd frontend
+  npm run dev
+  ```
 
 ---
 
-## 5. Live Viva Demonstration Credentials
+## 5. Live Viva Demonstration Accounts
 
-The application is pre-seeded via `CommandLineRunner` with ready-to-test accounts and proof files:
+Pre-seeded via [`DataInitializer`](backend/src/main/java/com/college/certifolio/service/DataInitializer.java) with ready-to-test profiles:
 
 | Account Type | Email | Password | Role / Details |
 | :--- | :--- | :--- | :--- |
 | **Student** | `student@college.edu` | `student123` | Arun Kumar (`23CS042`), CSE, CGPA: 8.8 (Has verified & pending proofs) |
 | **Student** | `priya@college.edu` | `student123` | Priya Sharma (`23CS015`), CSE, CGPA: 9.3 |
 | **Student** | `rahul@college.edu` | `student123` | Rahul Verma (`23IT028`), IT, CGPA: 7.9 |
-| **Faculty** | `faculty@college.edu` | `faculty123` | Faculty Auditor & Placement Coordinator |
+| **Faculty Auditor** | `faculty@college.edu` | `faculty123` | Faculty Reviewer & Placement Coordinator |
 
 > [!TIP]
-> **One-Click Quick Logins**: The login page includes quick-fill buttons for both Student and Faculty to accelerate your viva presentation.
+> **Viva Quick-Fill Buttons**: The Login page includes instant demo buttons ("Student Demo" & "Faculty Demo") so you never have to manually type credentials during viva presentations!
 
 ---
 
-## 6. How to Run the Project
+## 6. Viva-Voce Standout Questions & Architectural Safeguards
 
-### Prerequisites
-- Java 21 or higher (Java 24 fully supported)
-- Node.js (v18+) & npm
+Evaluators frequently ask: *"How does your system prevent students from uploading fake or unverified certificates to their public portfolio?"*
 
-### Step 1: Start the Spring Boot Backend
-Open a terminal in `backend/`:
-```bash
-# In Windows PowerShell:
-$env:JAVA_HOME = "C:\Program Files\Apache NetBeans\jdk"
-mvn clean spring-boot:run
-```
-- API Base URL: `http://localhost:8080`
-- Swagger UI (Interactive API Docs): `http://localhost:8080/swagger-ui/index.html`
-- H2 Database Web Console: `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:file:./data/certifoliodb`, User: `sa`, Password: empty)
-
-### Step 2: Start the React Frontend
-Open a separate terminal in `frontend/`:
-```bash
-npm install
-npm run dev
-```
-- Frontend SPA: `http://localhost:5173`
+Highlight these two architectural safeguards:
+1. **SQL-Level Status Filtering**: The public portfolio endpoint (`GET /api/portfolio/{rollNo}`) executes an explicit JPA query requiring `status = 'VERIFIED'`. Unverified or rejected submissions are never transmitted over the wire to public viewers.
+2. **Immutable Audit Timestamps & Remarks**: Every verified credential captures the exact server timestamp (`verified_at`) and signed remarks of the institutional faculty reviewer.
+3. **One-Click OpenPDF Transcript**: Evaluators can click "Download Official Portfolio PDF" to immediately inspect an institutional document dynamically drawn with student demographics, endorsed skills, and verified certificates.
 
 ---
 
-## 7. Viva-Voce Standout Tips
+## 7. Automated Test Suite
 
-During evaluations and viva questioning, be sure to highlight the **two architectural safeguards** against forged credentials:
-
-1. **SQL-Level Filtering**: Public portfolios execute a parameterized JPQL query strictly filtered by `status = 'VERIFIED'`. Unverified or rejected submissions are never transmitted to unauthorized clients.
-2. **Audit Timestamp & Remarks**: Every verified credential captures the faculty auditor's immutable review timestamp (`verified_at`) and digital remarks.
-3. **OpenPDF Integration**: The `/api/portfolio/{rollNo}/pdf` endpoint utilizes OpenPDF to draw a clean transcript containing verified skills, credentials, and institutional guarantees on-the-fly.
-
----
-
-## 8. Automated Testing
-
-Run the automated JUnit 5 test suite:
-```bash
+Run the 4 automated JUnit 5 tests covering verification logic, security filtering, file validation, and talent search:
+```powershell
+cd backend
 mvn test
 ```
-**Test Coverage Includes**:
-- Verification audit state machine transitions (`PENDING` $\to$ `VERIFIED`)
-- Public portfolio SQL status filtering
-- File storage MIME type & size validation
-- Multi-parameter JPQL talent search query
+Result: **Tests run: 4, Failures: 0, Errors: 0, Skipped: 0 (BUILD SUCCESS)**.
