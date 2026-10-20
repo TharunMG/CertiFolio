@@ -41,10 +41,7 @@ CertiFolio/
 │       ├── api/axiosConfig.js                   # Axios client with JWT interceptor
 │       ├── context/AuthContext.jsx              # Global authentication context
 │       ├── components/                          # Reusable UI components
-│       └── pages/                               # Application pages & views
 ├── docs/                                        # Formal project documentation
-├── run.bat                                      # 1-Click launcher for Windows cmd
-├── run.ps1                                      # 1-Click launcher for PowerShell
 └── README.md                                    # Project overview & quickstart
 ```
 

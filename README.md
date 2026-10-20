@@ -70,33 +70,32 @@ In academic institutions, students accumulate diverse credentials from external 
 
 ---
 
-## 4. Single-Command Launch (Zero Configuration)
+## 4. How to Run the Application
 
-CertiFolio includes one-click launch scripts that automatically detect Java 24 and Maven, start both services in parallel, and open your web browser:
+### Prerequisites
+- **Java**: JDK 21 or higher (Java 24 fully supported)
+- **Maven**: 3.8+
+- **Node.js**: v18+ & npm
 
-### Option A: Windows Batch File (Double-Click)
-Double-click [`run.bat`](run.bat) from File Explorer, or run:
-```cmd
-.\run.bat
-```
-
-### Option B: PowerShell
+### Step 1: Start the Spring Boot Backend (Port 8080)
+Open a terminal in the `backend/` directory:
 ```powershell
-.\run.ps1
+cd backend
+$env:JAVA_HOME = "C:\Program Files\Apache NetBeans\jdk"
+mvn spring-boot:run
 ```
+- REST API Base: `http://localhost:8080`
+- Interactive Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+- H2 Database Web Console: `http://localhost:8080/h2-console`
 
-### Option C: Manual Startup
-- **Backend (Port 8080)**:
-  ```powershell
-  cd backend
-  $env:JAVA_HOME = "C:\Program Files\Apache NetBeans\jdk"
-  mvn spring-boot:run
-  ```
-- **Frontend (Port 5173)**:
-  ```powershell
-  cd frontend
-  npm run dev
-  ```
+### Step 2: Start the React Frontend (Port 5173)
+Open a second terminal in the `frontend/` directory:
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+- Frontend SPA: `http://localhost:5173`
 
 ---
 
