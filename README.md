@@ -111,7 +111,20 @@ cd CertiFolio1
 ```
 
 ### 2. Build and run the application
-Using the bundled Maven wrapper:
+
+#### Option A: One-Click Runner (Windows)
+Simply double-click:
+```bat
+run.bat
+```
+*(Automatically detects Java, starts the Spring Boot server on port 5173, and opens your browser.)*
+
+Or via PowerShell:
+```powershell
+.\run.ps1
+```
+
+#### Option B: Maven Command
 ```bash
 # On Windows PowerShell / CMD:
 .\mvnw spring-boot:run
@@ -120,17 +133,17 @@ Using the bundled Maven wrapper:
 ./mvnw spring-boot:run
 ```
 
-The application will start on `http://localhost:8080`.
+The application will start on `http://localhost:5173`.
 
 ### 3. Explore Key Pages
-- 🌐 **Home Dashboard**: [http://localhost:8080/](http://localhost:8080/)
-- 👥 **Student Directory**: [http://localhost:8080/students](http://localhost:8080/students)
-- 🧠 **Skill Matrix**: [http://localhost:8080/skills](http://localhost:8080/skills)
-- 📜 **Certifications**: [http://localhost:8080/certifications](http://localhost:8080/certifications)
-- 🛡️ **Verifier Audit Console**: [http://localhost:8080/audit](http://localhost:8080/audit)
-- 📈 **Talent Analytics**: [http://localhost:8080/analytics](http://localhost:8080/analytics)
-- 📖 **Swagger UI (REST API)**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
-- 🗄️ **H2 Database Console**: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)  
+- 🌐 **Home Dashboard**: [http://localhost:5173/](http://localhost:5173/)
+- 👥 **Student Directory**: [http://localhost:5173/students](http://localhost:5173/students)
+- 🧠 **Skill Matrix**: [http://localhost:5173/skills](http://localhost:5173/skills)
+- 📜 **Certifications**: [http://localhost:5173/certifications](http://localhost:5173/certifications)
+- 🛡️ **Verifier Audit Console**: [http://localhost:5173/audit](http://localhost:5173/audit)
+- 📈 **Talent Analytics**: [http://localhost:5173/analytics](http://localhost:5173/analytics)
+- 📖 **Swagger UI (REST API)**: [http://localhost:5173/swagger-ui.html](http://localhost:5173/swagger-ui.html)
+- 🗄️ **H2 Database Console**: [http://localhost:5173/h2-console](http://localhost:5173/h2-console)  
   *(JDBC URL: `jdbc:h2:mem:certifoliodb`, User: `sa`, Password: empty)*
 
 ---
