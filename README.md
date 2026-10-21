@@ -6,7 +6,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.5-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-21%2B-orange.svg)](https://www.oracle.com/java/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![OpenAPI](https://img.shields.io/badge/Swagger-OpenAPI%203-green.svg)](http://localhost:8080/swagger-ui.html)
+[![OpenAPI](https://img.shields.io/badge/Swagger-OpenAPI%203-green.svg)](http://localhost:5173/swagger-ui.html)
 
 ---
 
@@ -18,6 +18,16 @@
 3. **Skill Matrix & Talent Search**: Recruiter-ready directory to filter students by skill combinations, proficiency levels, and department.
 4. **Talent Analytics**: Interactive visual charts (powered by Chart.js) highlighting institutional skill trends and top certification issuers.
 5. **REST API & Swagger UI**: Full RESTful interface documented interactively via OpenAPI 3 / Swagger.
+
+---
+
+## 📚 Documentation Suite
+
+For detailed documentation, refer to the guides in the [`docs/`](docs/) directory:
+
+- 📡 **[REST API Documentation](docs/API_DOCUMENTATION.md)**: Full REST endpoint catalog, request/response JSON schemas, query parameters, curl examples, and HTTP error codes.
+- 🏗️ **[System Design Documentation](docs/DESIGN_DOCUMENTATION.md)**: Layered architecture, Mermaid sequence and ER diagrams, certification verification state machine, data flows, and scalability considerations.
+- 💻 **[Code-Level Documentation](docs/CODE_LEVEL_DOCUMENTATION.md)**: Package breakdown, entity-by-entity, service-by-service, and method-by-method developer documentation, transactional rules, and extension guide.
 
 ---
 
