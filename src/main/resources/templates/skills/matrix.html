@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Matrix - CertiFolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/custom.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-2 shadow-sm no-print">
+        <div class="container-fluid px-lg-4">
+            <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/}">
+                <i class="fa-solid fa-graduation-cap text-primary fs-4"></i>
+                <span class="fs-4 fw-bold text-white">Certi<span class="text-primary">Folio</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCertifolio">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCertifolio">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-medium">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/}"><i class="fa-solid fa-chart-line me-1"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/students}"><i class="fa-solid fa-users me-1"></i> Students</a></li>
+                    <li class="nav-item"><a class="nav-link active" th:href="@{/skills}"><i class="fa-solid fa-brain me-1"></i> Skill Matrix</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/certifications}"><i class="fa-solid fa-certificate me-1"></i> Certifications</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/audit}"><i class="fa-solid fa-shield-halved me-1 text-warning"></i> Audit &amp; Verify</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/analytics}"><i class="fa-solid fa-chart-pie me-1"></i> Analytics</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container-fluid px-lg-4 py-3">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="fa-solid fa-brain text-primary me-2"></i>Institutional Skill Matrix</h3>
+                <p class="text-muted mb-0">Search and map student technical competencies across engineering domains.</p>
+            </div>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+            <form th:action="@{/skills}" method="get" class="row g-2 align-items-center">
+                <div class="col-md-7">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                        <input type="text" name="search" th:value="${search}" class="form-control border-start-0" placeholder="Search by skill name (e.g. Java, AWS, Python, Docker)...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="category" class="form-select">
+                        <option value="">All Skill Categories</option>
+                        <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat.displayName}" th:selected="${cat == selectedCategory}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-filter me-1"></i> Filter</button>
+                    <a th:href="@{/skills}" class="btn btn-outline-secondary"><i class="fa-solid fa-rotate-left"></i></a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Skills Grid -->
+        <div class="row g-3">
+            <div th:each="skill : ${skills}" class="col-md-6 col-lg-4 col-xl-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100 bg-white p-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="fw-bold mb-0 text-dark" th:text="${skill.name}">Java</h5>
+                        <span class="badge bg-primary-subtle text-primary" th:text="${skill.proficiencyLevel.displayName}">Expert</span>
+                    </div>
+                    <div class="text-muted small mb-3">
+                        <span class="badge bg-light text-secondary border" th:text="${skill.category.displayName}">Programming</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="small text-muted">Proficiency:</span>
+                        <div class="rating-stars">
+                            <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                <i th:class="${i <= skill.rating ? 'fa-solid fa-star' : 'fa-regular fa-star'}"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-top mt-auto d-flex justify-content-between align-items-center">
+                        <small class="text-muted text-truncate" style="max-width: 140px;">
+                            <i class="fa-solid fa-user me-1"></i> <span th:text="${skill.student.fullName}">Aarav Sharma</span>
+                        </small>
+                        <a th:href="@{/students/{id}/portfolio(id=${skill.student.id})}" class="btn btn-xs btn-outline-primary py-0 px-2" style="font-size: 0.8rem;">
+                            View Student &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${#lists.isEmpty(skills)}" class="col-12 text-center py-5">
+                <i class="fa-solid fa-brain fs-1 text-muted mb-2"></i>
+                <p class="text-muted">No skills found matching filter criteria.</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

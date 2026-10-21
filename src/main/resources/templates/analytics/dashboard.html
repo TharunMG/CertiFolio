@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Institutional Analytics - CertiFolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/custom.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-2 shadow-sm no-print">
+        <div class="container-fluid px-lg-4">
+            <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/}">
+                <i class="fa-solid fa-graduation-cap text-primary fs-4"></i>
+                <span class="fs-4 fw-bold text-white">Certi<span class="text-primary">Folio</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCertifolio">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCertifolio">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-medium">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/}"><i class="fa-solid fa-chart-line me-1"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/students}"><i class="fa-solid fa-users me-1"></i> Students</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/skills}"><i class="fa-solid fa-brain me-1"></i> Skill Matrix</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/certifications}"><i class="fa-solid fa-certificate me-1"></i> Certifications</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/audit}"><i class="fa-solid fa-shield-halved me-1 text-warning"></i> Audit &amp; Verify</a></li>
+                    <li class="nav-item"><a class="nav-link active" th:href="@{/analytics}"><i class="fa-solid fa-chart-pie me-1"></i> Analytics</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container-fluid px-lg-4 py-3">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="fa-solid fa-chart-pie text-primary me-2"></i>Institutional Talent Intelligence &amp; Analytics</h3>
+                <p class="text-muted mb-0">Aggregate competency metrics, top technical skills, and certification provider distribution.</p>
+            </div>
+            <div>
+                <button onclick="window.print()" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-print me-1"></i> Export Report</button>
+            </div>
+        </div>
+
+        <!-- Metrics Overview Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="card card-stat bg-white h-100 p-3">
+                    <span class="text-muted small text-uppercase fw-semibold">Total Students</span>
+                    <h2 class="fw-bold mt-2 mb-0" th:text="${analytics.totalStudents}">5</h2>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="card card-stat bg-white h-100 p-3">
+                    <span class="text-muted small text-uppercase fw-semibold">Total Certifications</span>
+                    <h2 class="fw-bold mt-2 mb-0 text-primary" th:text="${analytics.totalCertifications}">9</h2>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="card card-stat bg-white h-100 p-3">
+                    <span class="text-muted small text-uppercase fw-semibold">Verified Credentials</span>
+                    <h2 class="fw-bold mt-2 mb-0 text-success" th:text="${analytics.verifiedCertifications}">5</h2>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="card card-stat bg-white h-100 p-3">
+                    <span class="text-muted small text-uppercase fw-semibold">Verification Rate</span>
+                    <h2 class="fw-bold mt-2 mb-0 text-info"><span th:text="${analytics.verificationRatePercentage}">60.0</span>%</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="row g-4 mb-4">
+            <!-- Top Skills Bar Chart -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
+                    <h5 class="fw-bold mb-1"><i class="fa-solid fa-chart-simple text-primary me-2"></i>Top Technical Skills in Institution</h5>
+                    <p class="text-muted small mb-3">Frequency of self-assessed &amp; certified skills</p>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="skillsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Certifications by Issuer Pie Chart -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
+                    <h5 class="fw-bold mb-1"><i class="fa-solid fa-chart-pie text-success me-2"></i>Certifications by Provider / Issuer</h5>
+                    <p class="text-muted small mb-3">Market share of recognized credentials</p>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="issuerChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skill Categories Breakdown -->
+        <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-layer-group text-secondary me-2"></i>Competency Domain Distribution</h5>
+            <div class="row g-3">
+                <div th:each="entry : ${analytics.skillsByCategory}" class="col-sm-6 col-md-4 col-lg-3">
+                    <div class="p-3 bg-light rounded-3 border">
+                        <div class="text-muted small text-truncate" th:text="${entry.key}">Programming Language</div>
+                        <h4 class="fw-bold mb-0 mt-1" th:text="${entry.value}">6</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+    <!-- Chart Configuration Script -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const topSkillsData = /*[[${analytics.topSkills}]]*/ {};
+        const issuerData = /*[[${analytics.certificationsByIssuer}]]*/ {};
+
+        // Top Skills Bar Chart
+        const skillCtx = document.getElementById('skillsChart').getContext('2d');
+        new Chart(skillCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(topSkillsData),
+                datasets: [{
+                    label: 'Students Possessing Skill',
+                    data: Object.values(topSkillsData),
+                    backgroundColor: 'rgba(37, 99, 235, 0.75)',
+                    borderColor: 'rgb(37, 99, 235)',
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    }
+                }
+            }
+        });
+
+        // Issuers Pie Chart
+        const issuerCtx = document.getElementById('issuerChart').getContext('2d');
+        new Chart(issuerCtx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(issuerData),
+                datasets: [{
+                    data: Object.values(issuerData),
+                    backgroundColor: [
+                        '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#6366f1'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>

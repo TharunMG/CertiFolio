@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certifications Registry - CertiFolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/custom.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-2 shadow-sm no-print">
+        <div class="container-fluid px-lg-4">
+            <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/}">
+                <i class="fa-solid fa-graduation-cap text-primary fs-4"></i>
+                <span class="fs-4 fw-bold text-white">Certi<span class="text-primary">Folio</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCertifolio">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCertifolio">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-medium">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/}"><i class="fa-solid fa-chart-line me-1"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/students}"><i class="fa-solid fa-users me-1"></i> Students</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/skills}"><i class="fa-solid fa-brain me-1"></i> Skill Matrix</a></li>
+                    <li class="nav-item"><a class="nav-link active" th:href="@{/certifications}"><i class="fa-solid fa-certificate me-1"></i> Certifications</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/audit}"><i class="fa-solid fa-shield-halved me-1 text-warning"></i> Audit &amp; Verify</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/analytics}"><i class="fa-solid fa-chart-pie me-1"></i> Analytics</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-2">
+                    <a th:href="@{/certifications/new}" class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-plus me-1"></i> Submit Certification
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container-fluid px-lg-4 py-3">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="fa-solid fa-certificate text-primary me-2"></i>Institutional Certification Registry</h3>
+                <p class="text-muted mb-0">Complete ledger of industry credentials, issuing authorities, and verification statuses.</p>
+            </div>
+            <div>
+                <a th:href="@{/certifications/new}" class="btn btn-primary">
+                    <i class="fa-solid fa-plus me-1"></i> Submit New Certification
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Chips & Search -->
+        <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+            <form th:action="@{/certifications}" method="get" class="row g-2 align-items-center">
+                <div class="col-md-7">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                        <input type="text" name="search" th:value="${search}" class="form-control border-start-0" placeholder="Search by certification title, issuer, or credential ID...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">All Verification Statuses</option>
+                        <option value="VERIFIED" th:selected="${selectedStatus?.name() == 'VERIFIED'}">Verified</option>
+                        <option value="PENDING" th:selected="${selectedStatus?.name() == 'PENDING'}">Pending Audit</option>
+                        <option value="REJECTED" th:selected="${selectedStatus?.name() == 'REJECTED'}">Rejected</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-filter me-1"></i> Filter</button>
+                    <a th:href="@{/certifications}" class="btn btn-outline-secondary"><i class="fa-solid fa-rotate-left"></i></a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Certifications Table -->
+        <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+            <div class="table-responsive">
+                <table class="table align-middle table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Certification Title</th>
+                            <th>Issuing Body</th>
+                            <th>Student Holder</th>
+                            <th>Dates</th>
+                            <th>Credential ID</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="cert : ${certifications}">
+                            <td class="ps-4">
+                                <div class="fw-bold text-dark" th:text="${cert.title}">AWS Solutions Architect</div>
+                                <a th:if="${cert.credentialUrl}" th:href="${cert.credentialUrl}" target="_blank" class="small text-primary text-decoration-none">
+                                    <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Verify URL
+                                </a>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border fw-medium" th:text="${cert.issuingOrganization}">AWS</span>
+                            </td>
+                            <td>
+                                <a th:href="@{/students/{id}/portfolio(id=${cert.student.id})}" class="fw-medium text-decoration-none" th:text="${cert.student.fullName}">Aarav Sharma</a>
+                                <div class="small text-muted" th:text="${cert.student.department}">CSE</div>
+                            </td>
+                            <td>
+                                <div class="small">Issued: <span th:text="${cert.issueDate}">2025-03-15</span></div>
+                                <div th:if="${cert.expiryDate != null}" class="small text-muted">Expires: <span th:text="${cert.expiryDate}">2028-03-15</span></div>
+                            </td>
+                            <td>
+                                <code th:if="${cert.credentialId}" th:text="${cert.credentialId}">AWS-SAA-904128</code>
+                                <span th:unless="${cert.credentialId}" class="text-muted small">&mdash;</span>
+                            </td>
+                            <td>
+                                <span th:if="${cert.verificationStatus.name() == 'VERIFIED'}" class="verified-stamp">
+                                    <i class="fa-solid fa-circle-check"></i> Verified
+                                </span>
+                                <span th:if="${cert.verificationStatus.name() == 'PENDING'}" class="pending-stamp">
+                                    <i class="fa-solid fa-clock"></i> Pending
+                                </span>
+                                <span th:if="${cert.verificationStatus.name() == 'REJECTED'}" class="rejected-stamp">
+                                    <i class="fa-solid fa-circle-xmark"></i> Rejected
+                                </span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <a th:href="@{/students/{id}/portfolio(id=${cert.student.id})}" class="btn btn-sm btn-outline-primary me-1" title="View Portfolio">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                                <a th:href="@{/certifications/delete/{id}(id=${cert.id})}" 
+                                   onclick="return confirm('Delete certification record?')" 
+                                   class="btn btn-sm btn-outline-danger" title="Delete">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(certifications)}">
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fa-solid fa-folder-open fs-1 mb-2"></i>
+                                <p class="mb-0">No certifications found matching the criteria.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

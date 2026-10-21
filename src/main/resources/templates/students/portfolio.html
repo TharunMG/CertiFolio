@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${student.fullName + ' - CertiFolio Portfolio'}">Student Portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/custom.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-2 shadow-sm no-print">
+        <div class="container-fluid px-lg-4">
+            <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/}">
+                <i class="fa-solid fa-graduation-cap text-primary fs-4"></i>
+                <span class="fs-4 fw-bold text-white">Certi<span class="text-primary">Folio</span></span>
+            </a>
+            <div class="ms-auto d-flex gap-2">
+                <a th:href="@{/students}" class="btn btn-outline-light btn-sm"><i class="fa-solid fa-arrow-left me-1"></i> Directory</a>
+                <button onclick="window.print()" class="btn btn-outline-info btn-sm"><i class="fa-solid fa-print me-1"></i> Print / PDF</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alerts -->
+    <div class="container-fluid px-lg-4 mt-3 no-print">
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i> <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i> <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+
+    <!-- Portfolio Content -->
+    <main class="container-fluid px-lg-4 py-3">
+        <!-- Header Profile Banner -->
+        <div class="portfolio-header-card p-4 p-md-5 mb-4 shadow">
+            <div class="row align-items-center">
+                <div class="col-md-auto text-center text-md-start mb-3 mb-md-0">
+                    <div class="avatar-circle mx-auto" th:text="${#strings.substring(student.fullName, 0, 1)}">A</div>
+                </div>
+                <div class="col-md">
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                        <h2 class="fw-bold mb-0 text-white" th:text="${student.fullName}">Aarav Sharma</h2>
+                        <span class="badge bg-primary px-3 py-1 rounded-pill" th:text="${student.regNo}">REG2023CS0101</span>
+                    </div>
+                    <div class="text-light opacity-75 mb-2">
+                        <i class="fa-solid fa-building-columns me-1"></i> <span th:text="${student.department}">Computer Science &amp; Engineering</span> &bull; 
+                        Year <span th:text="${student.yearOfStudy}">4</span> &bull; 
+                        <span th:if="${student.cgpa != null}">CGPA: <strong class="text-white" th:text="${student.cgpa}">9.25</strong></span>
+                    </div>
+                    <p class="text-light opacity-90 mb-3" style="max-width: 800px;" th:text="${student.bio != null ? student.bio : 'Passionate engineering student showcasing verified academic competencies and industry certifications.'}">
+                        Student bio goes here.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2 align-items-center no-print">
+                        <a th:if="${student.email}" th:href="'mailto:' + ${student.email}" class="btn btn-sm btn-outline-light">
+                            <i class="fa-solid fa-envelope me-1"></i> <span th:text="${student.email}">email@domain.com</span>
+                        </a>
+                        <a th:if="${student.githubUrl}" th:href="${student.githubUrl}" target="_blank" class="btn btn-sm btn-outline-light">
+                            <i class="fa-brands fa-github me-1"></i> GitHub
+                        </a>
+                        <a th:if="${student.linkedinUrl}" th:href="${student.linkedinUrl}" target="_blank" class="btn btn-sm btn-outline-light">
+                            <i class="fa-brands fa-linkedin me-1 text-info"></i> LinkedIn
+                        </a>
+                        <button class="btn btn-sm btn-light text-dark" onclick="copyPortfolioLink()">
+                            <i class="fa-solid fa-share-nodes me-1"></i> Copy Link
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-auto mt-4 mt-md-0 text-end no-print">
+                    <div class="d-flex flex-column gap-2">
+                        <a th:href="@{/students/edit/{id}(id=${student.id})}" class="btn btn-outline-light btn-sm">
+                            <i class="fa-solid fa-pen-to-square me-1"></i> Edit Profile
+                        </a>
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addCertModal">
+                            <i class="fa-solid fa-certificate me-1"></i> Add Certification
+                        </button>
+                        <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#addSkillModal">
+                            <i class="fa-solid fa-brain me-1"></i> Add Skill
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left Column: Certifications (Primary Credential Registry) -->
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
+                    <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="fw-bold mb-0">
+                                <i class="fa-solid fa-stamp text-success me-2"></i>Verified Industry Certifications
+                            </h5>
+                            <small class="text-muted">Issued by recognized institutions and cloud providers</small>
+                        </div>
+                        <button class="btn btn-sm btn-primary no-print" data-bs-toggle="modal" data-bs-target="#addCertModal">
+                            <i class="fa-solid fa-plus me-1"></i> Add
+                        </button>
+                    </div>
+                    <div class="card-body px-4">
+                        <div th:if="${#lists.isEmpty(student.certifications)}" class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-file-circle-exclamation fs-1 mb-2 text-secondary"></i>
+                            <p class="mb-0">No certifications recorded yet. Click "Add" to submit credentials for institutional verification.</p>
+                        </div>
+                        <div th:unless="${#lists.isEmpty(student.certifications)}" class="d-flex flex-column gap-3">
+                            <div th:each="cert : ${student.certifications}" class="p-3 rounded-3 border bg-light-subtle">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <div>
+                                        <h6 class="fw-bold text-dark mb-0" th:text="${cert.title}">AWS Solutions Architect</h6>
+                                        <div class="text-muted small">
+                                            Issuer: <strong th:text="${cert.issuingOrganization}">AWS</strong> &bull; 
+                                            Issued: <span th:text="${cert.issueDate}">2025-03-15</span>
+                                            <span th:if="${cert.expiryDate != null}"> &bull; Expires: <span th:text="${cert.expiryDate}">2028-03-15</span></span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span th:if="${cert.verificationStatus.name() == 'VERIFIED'}" class="verified-stamp">
+                                            <i class="fa-solid fa-circle-check"></i> Verified
+                                        </span>
+                                        <span th:if="${cert.verificationStatus.name() == 'PENDING'}" class="pending-stamp">
+                                            <i class="fa-solid fa-clock"></i> Pending Audit
+                                        </span>
+                                        <span th:if="${cert.verificationStatus.name() == 'REJECTED'}" class="rejected-stamp">
+                                            <i class="fa-solid fa-circle-xmark"></i> Rejected
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div th:if="${cert.credentialId}" class="small text-secondary mb-2">
+                                    Credential ID: <code th:text="${cert.credentialId}">AWS-SAA-904128</code>
+                                </div>
+
+                                <!-- Verifier Feedback / Audit Info -->
+                                <div th:if="${cert.verifierNotes}" class="alert alert-light border py-1 px-2 mb-2 small text-muted">
+                                    <i class="fa-solid fa-shield me-1"></i> <strong th:text="${cert.verifiedBy != null ? cert.verifiedBy : 'Institutional Verifier'}">Verifier</strong>: 
+                                    <span th:text="${cert.verifierNotes}">Notes</span>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                    <div>
+                                        <a th:if="${cert.credentialUrl}" th:href="${cert.credentialUrl}" target="_blank" class="btn btn-xs btn-outline-primary py-0 px-2" style="font-size: 0.8rem;">
+                                            <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Verify External Proof
+                                        </a>
+                                    </div>
+                                    <div class="no-print">
+                                        <a th:href="@{/certifications/delete/{id}(id=${cert.id}, studentId=${student.id})}" 
+                                           onclick="return confirm('Remove this certification?')" 
+                                           class="text-danger small text-decoration-none">
+                                            <i class="fa-regular fa-trash-can"></i> Remove
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Skills Matrix -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
+                    <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="fw-bold mb-0">
+                                <i class="fa-solid fa-brain text-primary me-2"></i>Technical Skills
+                            </h5>
+                            <small class="text-muted">Self-assessed competencies and proficiencies</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary no-print" data-bs-toggle="modal" data-bs-target="#addSkillModal">
+                            <i class="fa-solid fa-plus me-1"></i> Add
+                        </button>
+                    </div>
+                    <div class="card-body px-4">
+                        <div th:if="${#lists.isEmpty(student.skills)}" class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-lightbulb fs-1 mb-2 text-secondary"></i>
+                            <p class="mb-0">No skills added yet.</p>
+                        </div>
+                        <div th:unless="${#lists.isEmpty(student.skills)}" class="d-flex flex-column gap-3">
+                            <div th:each="skill : ${student.skills}" class="d-flex align-items-center justify-content-between p-2 rounded-2 border-bottom">
+                                <div>
+                                    <div class="fw-bold text-dark" th:text="${skill.name}">Java</div>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <span class="badge bg-light text-secondary border" style="font-size: 0.75rem;" th:text="${skill.category.displayName}">Programming</span>
+                                        <span class="badge bg-primary-subtle text-primary" style="font-size: 0.75rem;" th:text="${skill.proficiencyLevel.displayName}">Expert</span>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="rating-stars mb-1">
+                                        <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                            <i th:class="${i <= skill.rating ? 'fa-solid fa-star' : 'fa-regular fa-star'}"></i>
+                                        </span>
+                                    </div>
+                                    <div class="no-print">
+                                        <a th:href="@{/skills/delete/{id}(id=${skill.id}, studentId=${student.id})}" 
+                                           onclick="return confirm('Remove this skill?')" 
+                                           class="text-muted small text-decoration-none">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal: Add Certification -->
+    <div class="modal fade no-print" id="addCertModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 shadow">
+                <form th:action="@{/certifications/save}" th:object="${certDto}" method="post">
+                    <input type="hidden" th:field="*{studentId}">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold"><i class="fa-solid fa-certificate text-primary me-2"></i>Add Certification</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Certification Title <span class="text-danger">*</span></label>
+                            <input type="text" th:field="*{title}" class="form-control" placeholder="e.g. AWS Solutions Architect - Associate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Issuing Organization <span class="text-danger">*</span></label>
+                            <input type="text" th:field="*{issuingOrganization}" class="form-control" placeholder="e.g. Amazon Web Services, Oracle, Coursera" required>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Issue Date <span class="text-danger">*</span></label>
+                                <input type="date" th:field="*{issueDate}" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Expiry Date (Optional)</label>
+                                <input type="date" th:field="*{expiryDate}" class="form-control">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Credential ID</label>
+                            <input type="text" th:field="*{credentialId}" class="form-control" placeholder="e.g. AWS-SAA-904128">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Verification / Proof URL</label>
+                            <input type="url" th:field="*{credentialUrl}" class="form-control" placeholder="https://aws.amazon.com/verification...">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-upload me-1"></i> Submit for Verification</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Add Skill -->
+    <div class="modal fade no-print" id="addSkillModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 shadow">
+                <form th:action="@{/skills/save}" th:object="${skillDto}" method="post">
+                    <input type="hidden" th:field="*{studentId}">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold"><i class="fa-solid fa-brain text-primary me-2"></i>Add Skill</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Skill Name <span class="text-danger">*</span></label>
+                            <input type="text" th:field="*{name}" class="form-control" placeholder="e.g. Spring Boot, Docker, React, Python" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+                            <select th:field="*{category}" class="form-select" required>
+                                <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat.displayName}"></option>
+                            </select>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Proficiency Level</label>
+                                <select th:field="*{proficiencyLevel}" class="form-select">
+                                    <option th:each="lvl : ${levels}" th:value="${lvl}" th:text="${lvl.displayName}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Rating (1 to 5 Stars)</label>
+                                <select th:field="*{rating}" class="form-select">
+                                    <option value="1">1 Star - Fundamental</option>
+                                    <option value="2">2 Stars - Working</option>
+                                    <option value="3" selected>3 Stars - Proficient</option>
+                                    <option value="4">4 Stars - Advanced</option>
+                                    <option value="5">5 Stars - Expert Master</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus me-1"></i> Add Skill</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script to copy portfolio link -->
+    <script>
+        function copyPortfolioLink() {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Portfolio link copied to clipboard!");
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
